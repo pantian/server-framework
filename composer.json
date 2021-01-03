@@ -1,0 +1,34 @@
+{
+    "name": "pantian/server-framework",
+    "type": "library",
+    "description": "server framework",
+    "keywords": [
+        "php",
+        "swoole",
+        "coroutine",
+        "simple",
+        "simps"
+    ],
+    "license": "Apache-2.0",
+    "require": {
+        "php": ">=7.1",
+        "ext-swoole": ">=4.4"
+    },
+    "authors": [
+        {
+            "name": "pan tian",
+            "email": "pt444@126.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+
+        }
+    },
+    "bin": [
+        "bin/simps.php"
+    ],
+    "config": {
+        "optimize-autoloader": true
+    }
+}
