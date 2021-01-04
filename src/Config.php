@@ -54,6 +54,19 @@ class Config
         return $config;
     }
 
+	/**
+	 * 监听类型配置
+	 * @return mixed|null
+	 */
+	public function getListener(){
+	    return self::getInstance()->get('listeners',[]);
+	}
 
-
+	/**
+	 * 服务器配置
+	 * @return mixed|null
+	 */
+	public function getServersConfig(){
+	    return self::getInstance()->get('servers');
+	}
 }

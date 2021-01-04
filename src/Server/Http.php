@@ -11,6 +11,7 @@ use PTFramework\DB\PDO;
 use PTFramework\Listener;
 use PTFramework\Route;
 use PTFramework\Server\Protocol\HTTP\SimpleRoute;
+use PTFramework\Tool\Tool;
 use Swoole\Coroutine;
 use Swoole\Http\Server;
 use Swoole\Server as HttpServer;
@@ -98,8 +99,9 @@ class Http
 
     public function onRequest(\Swoole\Http\Request $request, \Swoole\Http\Response $response)
     {
-	    Context::set('SwRequest', $request);
-        Context::set('SwResponse', $response);
+    	$request->_request_id=uniqid();
+	    Context::set('request', $request);
+        Context::set('response', $response);
         $res=$this->_route->dispatch($request, $response);
 
     }

@@ -70,4 +70,11 @@ class Context
     {
         return Coroutine::getCid() > 0;
     }
+
+	/**
+	 * @return array
+	 */
+    public static function all(){
+        return self::$nonCoContext;
+    }
 }

@@ -6,6 +6,9 @@ declare(strict_types=1);
 namespace PTFramework;
 
 use FastRoute\Dispatcher;
+use PTFramework\Factory\InstanceFactory;
+use PTFramework\MiddlewareInterface\RequestMiddlewareInterface;
+use PTFramework\Tool\Tool;
 use RuntimeException;
 use function FastRoute\simpleDispatcher;
 
@@ -21,16 +24,25 @@ class Route
     {
     }
 
+	/**
+	 * @return \PTFramework\Route
+	 */
     public static function getInstance()
     {
         if (is_null(self::$instance)) {
             self::$instance = new self();
 
-            self::$config = Config::getInstance()->get('routes', []);
+	        self::$config = Config::getInstance()->get('routes');
             self::$dispatcher = simpleDispatcher(
+
                 function (\FastRoute\RouteCollector $routerCollector) {
                     foreach (self::$config as $routerDefine) {
-                        $routerCollector->addRoute($routerDefine[0], $routerDefine[1], $routerDefine[2]);
+                    	try{
+		                    $routerCollector->addRoute($routerDefine[0], $routerDefine[1], $routerDefine[2]);
+                    	}catch(\Exception $e){
+                    	    Application::echoError($e->getMessage());
+                    	}
+
                     }
                 }
             );
@@ -50,6 +62,13 @@ class Route
         $uri = $request->server['request_uri'] ?? '/';
         $routeInfo = self::$dispatcher->dispatch($method, $uri);
 
+		$requestMiddle=Tool::getArrVal('middleware.requestMiddleware',Config::getInstance()->getListener());
+
+		if($requestMiddle && class_exists($requestMiddle)){
+			$requestMiddle::RequestStart( $request, $response );
+		}
+
+
         switch ($routeInfo[0]) {
             case Dispatcher::NOT_FOUND:
                 return $this->defaultRouter($request, $response, $uri);
@@ -60,6 +79,7 @@ class Route
                 $handler = $routeInfo[1];
                 $vars = $routeInfo[2];
                 if (is_string($handler)) {
+
                     $handler = explode('@', $handler);
                     if (count($handler) != 2) {
                         throw new RuntimeException("Route {$uri} config error, Only @ are supported");
@@ -72,26 +92,45 @@ class Route
                         throw new RuntimeException("Route {$uri} defined '{$className}' Class Not Found");
                     }
 
+
                     $controller = new $className();
 
                     if (! method_exists($controller, $func)) {
                         throw new RuntimeException("Route {$uri} defined '{$func}' Method Not Found");
                     }
 
-                    $middlewareHandler = function ($request, $response, $vars) use ($controller, $func) {
-                        return $controller->{$func}($request, $response, $vars ?? null);
-                    };
-                    $middleware = 'middleware';
-                    if (property_exists($controller, $middleware)) {
-                        $classMiddlewares = $controller->{$middleware}['__construct'] ?? [];
-                        $methodMiddlewares = $controller->{$middleware}[$func] ?? [];
-                        $middlewares = array_merge($classMiddlewares, $methodMiddlewares);
-                        if ($middlewares) {
-                            $middlewareHandler = $this->packMiddleware($middlewareHandler, array_reverse($middlewares));
-                        }
+                    try{
+	                    $middlewareHandler = function ($request, $response, $vars) use ($controller, $func) {
+		                    return $controller->{$func}($request, $response, $vars ?? null);
+	                    };
+	                    $middleware = 'middleware';
+
+	                    if (property_exists($controller, $middleware)) {
+		                    $classMiddlewares = $controller->{$middleware}['__construct'] ?? [];
+		                    $methodMiddlewares = $controller->{$middleware}[$func] ?? [];
+		                    $middlewares = array_merge($classMiddlewares, $methodMiddlewares);
+		                    if ($middlewares) {
+			                    $middlewareHandler = $this->packMiddleware($middlewareHandler, array_reverse($middlewares));
+		                    }
+	                    }
+	                    $result= $middlewareHandler($request, $response, $vars ?? null);
+
+                    }catch(\Exception $e){
+	                    $result=$e;
+                    }catch (\TypeError $e){
+	                    $result=$e;
                     }
-                    return $middlewareHandler($request, $response, $vars ?? null);
+	                if($requestMiddle && class_exists($requestMiddle)){
+		                $requestMiddle::End( $request, $response,$result );
+
+	                }else{
+	                	$response->end((string)$result);
+	                }
+					return true;
                 }
+
+
+
 
                 if (is_callable($handler)) {
                     return call_user_func_array($handler, [$request, $response, $vars ?? null]);
