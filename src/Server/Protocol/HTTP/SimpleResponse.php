@@ -8,7 +8,7 @@ declare(strict_types=1);
  * @document https://doc.simps.io
  * @license  https://github.com/simple-swoole/simps/blob/master/LICENSE
  */
-namespace Simps\Server\Protocol\HTTP;
+namespace PTFramework\Server\Protocol\HTTP;
 
 class SimpleResponse
 {

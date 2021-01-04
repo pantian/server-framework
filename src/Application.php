@@ -1,35 +1,27 @@
 <?php
 
 declare(strict_types=1);
-/**
- * This file is part of Simps.
- *
- * @link     https://simps.io
- * @document https://doc.simps.io
- * @license  https://github.com/simple-swoole/simps/blob/master/LICENSE
- */
-namespace Simps;
+
+namespace PTFramework;
 
 class Application
 {
     /**
      * @var string
      */
-    protected static $version = '1.0.5';
+    protected static $version = '1.0.0';
 
     public static function welcome()
     {
         $appVersion = self::$version;
         $swooleVersion = SWOOLE_VERSION;
         echo <<<EOL
-  ____    _                           
- / ___|  (_)  _ __ ___    _ __    ___ 
- \\___ \\  | | | '_ ` _ \\  | '_ \\  / __|
-  ___) | | | | | | | | | | |_) | \\__ \\
- |____/  |_| |_| |_| |_| | .__/  |___/
-                         |_|           Version: {$appVersion}, Swoole: {$swooleVersion}
-
-
+         ______    __________
+		|      |        |  
+        |      |        |          Version: {$appVersion}, Swoole: {$swooleVersion}
+		|——————         |
+		|               |
+		|               |
 EOL;
     }
 

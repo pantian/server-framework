@@ -12,7 +12,8 @@
     "license": "Apache-2.0",
     "require": {
         "php": ">=7.1",
-        "ext-swoole": ">=4.4"
+        "ext-swoole": ">=4.4",
+        "nikic/fast-route": "^1.3"
     },
     "authors": [
         {
@@ -22,11 +23,11 @@
     ],
     "autoload": {
         "psr-4": {
-
+            "PTFramework\\": "src/"
         }
     },
     "bin": [
-        "bin/simps.php"
+        "bin/server.php"
     ],
     "config": {
         "optimize-autoloader": true

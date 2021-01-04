@@ -1,21 +1,15 @@
 <?php
 
 declare(strict_types=1);
-/**
- * This file is part of Simps.
- *
- * @link     https://simps.io
- * @document https://doc.simps.io
- * @license  https://github.com/simple-swoole/simps/blob/master/LICENSE
- */
-namespace Simps\Server;
 
-use Simps\Application;
-use Simps\Context;
-use Simps\DB\PDO;
-use Simps\Listener;
-use Simps\Route;
-use Simps\Server\Protocol\HTTP\SimpleRoute;
+namespace PTFramework\Server;
+
+use PTFramework\Application;
+use PTFramework\Context;
+use PTFramework\DB\PDO;
+use PTFramework\Listener;
+use PTFramework\Route;
+use PTFramework\Server\Protocol\HTTP\SimpleRoute;
 use Swoole\Coroutine;
 use Swoole\Http\Server;
 use Swoole\Server as HttpServer;
