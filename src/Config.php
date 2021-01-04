@@ -33,9 +33,7 @@ class Config
         if (empty($keys)) {
             return null;
         }
-
         $file = array_shift($keys);
-
         if (empty(self::$config[$file])) {
             if (! is_file(CONFIG_PATH . $file . '.php')) {
                 return null;
@@ -55,4 +53,7 @@ class Config
 
         return $config;
     }
+
+
+
 }

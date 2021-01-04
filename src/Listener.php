@@ -29,7 +29,11 @@ class Listener
         while ($listeners) {
             [$class, $func] = array_shift($listeners);
             try {
-                $class::getInstance()->{$func}(...$args);
+            	if(class_exists($class)){
+		            $class::getInstance()->{$func}(...$args);
+	            }else{
+            		print_r("类不存在:$class");
+	            }
             } catch (\Exception $e) {
                 throw new \Exception($e->getMessage());
             }

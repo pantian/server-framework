@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace PTFramework\Server;
 
 use PTFramework\Application;
+use PTFramework\Config;
 use PTFramework\Context;
 use PTFramework\DB\PDO;
 use PTFramework\Listener;
@@ -25,7 +26,7 @@ class Http
 
     public function __construct()
     {
-        $config = config('servers');
+        $config = Config::getInstance()->get('servers');
         $httpConfig = $config['http'];
         $this->_config = $httpConfig;
 

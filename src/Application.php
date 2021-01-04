@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace PTFramework;
 
+use SebastianBergmann\CodeCoverage\Report\PHP;
+
 class Application
 {
     /**
@@ -15,14 +17,7 @@ class Application
     {
         $appVersion = self::$version;
         $swooleVersion = SWOOLE_VERSION;
-        echo <<<EOL
-         ______    __________
-		|      |        |  
-        |      |        |          Version: {$appVersion}, Swoole: {$swooleVersion}
-		|——————         |
-		|               |
-		|               |
-EOL;
+        echo" ptphp server framework Version: {$appVersion}, Swoole: {$swooleVersion}".PHP_EOL.PHP_EOL;
     }
 
     public static function println($strings)
