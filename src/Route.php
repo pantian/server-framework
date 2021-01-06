@@ -22,6 +22,8 @@ class Route
 
     private static $dispatcher = null;
 
+	private static array $_type_arr = [ 'GET', 'POST' ];
+
     private function __construct()
     {
     }
@@ -35,21 +37,50 @@ class Route
             self::$instance = new self();
 
 	        self::$config = Config::getInstance()->get('routes');
+
             self::$dispatcher = simpleDispatcher(
 
                 function (\FastRoute\RouteCollector $routerCollector) {
-                    foreach (self::$config as $routerDefine) {
+                    foreach (self::$config as $key=>$routerDefine) {
                     	try{
-		                    $routerCollector->addRoute($routerDefine[0], $routerDefine[1], $routerDefine[2]);
+                    		$key=(string)$key;
+		                    if(in_array($key,self::$_type_arr)){
+			                    foreach ( $routerDefine as $GETRoute ) {
+				                    self::setRoute($routerCollector,$key,$GETRoute[0], $GETRoute[1]);
+                    			}
+                    		}elseif($key === 'GROUP'){
+			                    foreach ( $routerDefine as $groupKey=>$routes ) {
+				                    foreach ( $routes as $_nextKey=>$route ) {
+					                    if(in_array((string)$_nextKey,self::$_type_arr)){
+						                    foreach ( $route as $_v ) {
+							                    self::setRoute($routerCollector,$_nextKey,$groupKey.$_v[0], $_v[1]);
+						                    }
+					                    }else{
+						                    self::setRoute($routerCollector,$route[0], $groupKey.$route[1], $route[2]);
+					                    }
+									}
+
+			                    }
+
+		                    }else{
+			                    self::setRoute($routerCollector,$routerDefine[0], $routerDefine[1], $routerDefine[2]);
+		                    }
+
                     	}catch(\Exception $e){
                     	    Application::echoError($e->getMessage());
                     	}
 
                     }
+
                 }
             );
         }
         return self::$instance;
+    }
+
+
+    public static function setRoute($instance,$type,$path,$method){
+	    $instance->addRoute($type,$path, $method);
     }
 
     /**
