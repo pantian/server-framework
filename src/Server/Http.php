@@ -22,6 +22,8 @@ class Http
 
     protected $_config;
 
+    protected $_server_name;
+
     /** @var \Simps\Route */
     protected $_route;
 
@@ -30,7 +32,7 @@ class Http
         $config = Config::getInstance()->get('servers');
         $httpConfig = $config['http'];
         $this->_config = $httpConfig;
-
+		$this->_server_name=$httpConfig['server_name'];
         if (isset($httpConfig['settings']['only_simple_http'])) {
 
             $this->_server = new HttpServer($httpConfig['ip'], $httpConfig['port'], $config['mode']);
@@ -50,11 +52,12 @@ class Http
         }
 
         $this->_server->set($httpConfig['settings']);
-
+	    $this->_server->on('managerStart', [$this, 'onManagerStart']);
+	    $this->_server->on('start', [$this, 'onStart']);
         if ($config['mode'] == SWOOLE_BASE) {
-            $this->_server->on('managerStart', [$this, 'onManagerStart']);
+
         } else {
-            $this->_server->on('start', [$this, 'onStart']);
+
         }
 
         foreach ($httpConfig['callbacks'] as $eventKey => $callbackItem) {
@@ -74,12 +77,15 @@ class Http
 
     public function onStart(HttpServer $server)
     {
-        Application::echoSuccess("Swoole Http Server running：http://{$this->_config['ip']}:{$this->_config['port']}");
+
+    	swoole_set_process_name($this->_server_name.'.main');
+       // Application::echoSuccess("Swoole Http Server running：http://{$this->_config['ip']}:{$this->_config['port']}");
         Listener::getInstance()->listen('start', $server);
     }
 
     public function onManagerStart(HttpServer $server)
     {
+	    swoole_set_process_name($this->_server_name.'.manager');
         Application::echoSuccess("Swoole Http Server running：http://{$this->_config['ip']}:{$this->_config['port']}");
         Listener::getInstance()->listen('managerStart', $server);
     }
@@ -87,7 +93,7 @@ class Http
     public function onWorkerStart(HttpServer $server, int $workerId)
     {
         $this->_route = Route::getInstance();
-
+	    swoole_set_process_name($this->_server_name.'.worker.'.$workerId);
         Listener::getInstance()->listen('workerStart', $server, $workerId);
     }
 
@@ -99,9 +105,6 @@ class Http
 
     public function onRequest(\Swoole\Http\Request $request, \Swoole\Http\Response $response)
     {
-    	$request->_request_id=uniqid();
-	    Context::set('request', $request);
-        Context::set('response', $response);
         $res=$this->_route->dispatch($request, $response);
 
     }

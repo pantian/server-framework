@@ -1,7 +1,7 @@
 <?php
 
 
-namespace PTFramework\Factory;
+namespace PTLibrary\Factory;
 
 /**
  * 类实例化工厂

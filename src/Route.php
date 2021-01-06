@@ -8,7 +8,9 @@ namespace PTFramework;
 use FastRoute\Dispatcher;
 use PTFramework\Factory\InstanceFactory;
 use PTFramework\MiddlewareInterface\RequestMiddlewareInterface;
-use PTFramework\Tool\Tool;
+
+use PTLibrary\Log\Log;
+use PTLibrary\Tool\Tool;
 use RuntimeException;
 use function FastRoute\simpleDispatcher;
 
@@ -104,7 +106,9 @@ class Route
 		                    return $controller->{$func}($request, $response, $vars ?? null);
 	                    };
 	                    $middleware = 'middleware';
-
+						if(method_exists($controller,'init')){
+						    $controller->init($request,$response);
+						}
 	                    if (property_exists($controller, $middleware)) {
 		                    $classMiddlewares = $controller->{$middleware}['__construct'] ?? [];
 		                    $methodMiddlewares = $controller->{$middleware}[$func] ?? [];
@@ -115,17 +119,25 @@ class Route
 	                    }
 	                    $result= $middlewareHandler($request, $response, $vars ?? null);
 
+
                     }catch(\Exception $e){
+	                    print_r( '异常：'.$e->getMessage().PHP_EOL );
+	                    print_r( '调用：'.$e->getTraceAsString().PHP_EOL );
+	                    Log::error($e->getMessage().PHP_EOL.$e->getTraceAsString());
 	                    $result=$e;
                     }catch (\TypeError $e){
+	                    print_r( $e->getMessage() .PHP_EOL);
+	                    Log::error($e->getMessage().PHP_EOL.$e->getTraceAsString());
 	                    $result=$e;
                     }
+
 	                if($requestMiddle && class_exists($requestMiddle)){
 		                $requestMiddle::End( $request, $response,$result );
 
 	                }else{
 	                	$response->end((string)$result);
 	                }
+
 					return true;
                 }
 
