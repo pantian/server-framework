@@ -22,7 +22,7 @@ class Route
 
     private static $dispatcher = null;
 
-	private static array $_type_arr = [ 'GET', 'POST' ];
+	private static  $_type_arr = [ 'GET', 'POST' ];
 
     private function __construct()
     {
