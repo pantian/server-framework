@@ -10,6 +10,7 @@ use PTFramework\Factory\InstanceFactory;
 use PTFramework\MiddlewareInterface\RequestMiddlewareInterface;
 
 use PTLibrary\Log\Log;
+
 use PTLibrary\Tool\Tool;
 use RuntimeException;
 use function FastRoute\simpleDispatcher;
@@ -94,7 +95,6 @@ class Route
         $method = $request->server['request_method'] ?? 'GET';
         $uri = $request->server['request_uri'] ?? '/';
         $routeInfo = self::$dispatcher->dispatch($method, $uri);
-
 		$requestMiddle=Tool::getArrVal('middleware.requestMiddleware',Config::getInstance()->getListener());
 
 		if($requestMiddle && class_exists($requestMiddle)){

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace PTFramework\Server;
 
+use PTFramework\Config;
+
 class MainServer
 {
     protected $_server;
@@ -12,9 +14,13 @@ class MainServer
 
     public function __construct()
     {
-        $config = config('servers', []);
+//        $config = config('servers', []);
+        $configInstance=Config::getInstance();
+        $config=$configInstance->get('servers');
         $this->_config = $config['main'];
-        $this->_server = new $this->_config['class_name'](
+        $serverClass=$this->_config['class_name'];
+
+        $this->_server = new $serverClass(
             $this->_config['ip'],
             $this->_config['port'],
             $this->_config['mode'] ?? SWOOLE_PROCESS,
