@@ -10,7 +10,6 @@ use PTFramework\Factory\InstanceFactory;
 use PTFramework\MiddlewareInterface\RequestMiddlewareInterface;
 
 use PTLibrary\Log\Log;
-
 use PTLibrary\Tool\Tool;
 use RuntimeException;
 use function FastRoute\simpleDispatcher;
@@ -23,7 +22,7 @@ class Route
 
     private static $dispatcher = null;
 
-	private static  $_type_arr = [ 'GET', 'POST' ];
+	private static $_type_arr = [ 'GET', 'POST' ];
 
     private function __construct()
     {
@@ -72,7 +71,7 @@ class Route
                     	}
 
                     }
-
+	               // print_r( $routerCollector->getData() );
                 }
             );
         }
@@ -93,19 +92,17 @@ class Route
     public function dispatch($request, $response)
     {
         $method = $request->server['request_method'] ?? 'GET';
-        $uri = $request->server['request_uri'] ?? '/';
+        $uri = trim($request->server['request_uri'] ?? '/');
         $routeInfo = self::$dispatcher->dispatch($method, $uri);
 		$requestMiddle=Tool::getArrVal('middleware.requestMiddleware',Config::getInstance()->getListener());
-
 		if($requestMiddle && class_exists($requestMiddle)){
 			$requestMiddle::RequestStart( $request, $response );
 		}
-
-
         switch ($routeInfo[0]) {
             case Dispatcher::NOT_FOUND:
                 return $this->defaultRouter($request, $response, $uri);
             case Dispatcher::METHOD_NOT_ALLOWED:
+
                 $response->status(405);
                 return $response->end();
             case Dispatcher::FOUND:
