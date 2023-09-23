@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace PTFramework;
 
+use PTFramework\Server\CoroutineHttp;
+use PTLibrary\Log\Log;
 use SebastianBergmann\CodeCoverage\Report\PHP;
 
 class Application
@@ -11,18 +13,18 @@ class Application
     /**
      * @var string
      */
-    protected static $version = '1.0.0';
+    protected static $version = '1.4';
 
     public static function welcome()
     {
         $appVersion = self::$version;
         $swooleVersion = SWOOLE_VERSION;
-        echo" ptphp server framework Version: {$appVersion}, Swoole: {$swooleVersion}".PHP_EOL.PHP_EOL;
+        echo" http server framework Version: {$appVersion}, Swoole: {$swooleVersion}".PHP_EOL.PHP_EOL;
     }
 
     public static function println($strings)
     {
-        echo $strings . PHP_EOL;
+        Log::log( $strings . PHP_EOL);
     }
 
     public static function echoSuccess($msg)
@@ -35,6 +37,19 @@ class Application
         self::println('[' . date('Y-m-d H:i:s') . '] [ERROR] ' . "\033[31m{$msg}\033[0m");
     }
 
+	public static function killProcess($processName){
+	    $mod="ps -ef|grep {$processName}|cut -c 9-15|xargs kill -9";
+
+	    print_r(system($mod));
+
+
+	}
+
+    public static function stop(){
+
+    }
+
+
     public static function run()
     {
         self::welcome();
@@ -44,7 +59,8 @@ class Application
         $command = explode(':', $funcName);
         switch ($command[0]) {
             case 'http':
-                $className = \PTFramework\Server\Http::class;
+//                $className = \PTFramework\Server\Http::class;
+                $className = CoroutineHttp::class;
                 break;
             case 'ws':
                 $className = \PTFramework\Server\WebSocket::class;
@@ -72,4 +88,6 @@ class Application
                 self::echoError("use {$argv[0]} [http:start, ws:start, mqtt:start, main:start]");
         }
     }
+
+	
 }

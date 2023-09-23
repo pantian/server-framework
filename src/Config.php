@@ -62,6 +62,14 @@ class Config
 	    return self::getInstance()->get('listeners',[]);
 	}
 
+    /**
+     * @return $this
+     */
+    public function clean(){
+        self::$config=[];
+        return $this;
+    }
+
 	/**
 	 * 服务器配置
 	 * @return mixed|null
